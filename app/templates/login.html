@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Login</h2>
+
+<form method='POST' >
+    {{ form.hidden_tag() }}
+    <p>{{ form.username.label }} {{ form.username }}</p>
+    <p>{{ form.password.label }} {{ form.password }}</p>
+    <p>{{ form.submit() }}</p>
+</form>
+<!--displays any sent out flash messages-->
+{% with messages = get_flashed_messages() %}
+    {% for message in messages %}
+        <p style="color:red;">{{ message }}</p>
+    {% endfor %}
+{% endwith %}
+
+{% endblock %}
