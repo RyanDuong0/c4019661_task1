@@ -1,5 +1,3 @@
-from xml.dom import ValidationErr
-
 from flask_wtf import FlaskForm
 from wtforms import StringField
 from wtforms.fields.simple import PasswordField, SubmitField
@@ -7,6 +5,14 @@ from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationE
 
 def validateEmailDomain(form, field):
     allowedDomains = {".edu", ".ac.uk",".org"}
+    isValid = False
+    for domain in allowedDomains:
+        if field.data.endswith(domain):
+            isValid = True #stop once we found a valid email domain
+            break
+
+    if not isValid:
+        raise ValidationError(f"Email must end with: {', '.join(allowedDomains)}")
 
 def validateUsername(form, field): #checking for reserved usernames
     disallowedUsernames = {"admin", "root","superuser"}
@@ -19,7 +25,11 @@ class RegisterForm(FlaskForm):
         Length(3, 30, message="Username must be between 3 and 30 characters"),
         validateUsername
     ])
-    email = StringField('Email', validators=[DataRequired(message="Email is required."), Email()])
+    email = StringField('Email', validators=[
+        DataRequired(message="Email is required."),
+        Email(),
+        validateEmailDomain
+    ])
     password = PasswordField('Password', validators=[DataRequired("Password is required.")])
     confirmPassword = PasswordField('Confirm Password', validators=[DataRequired("Please confirm your password."), EqualTo('password')])
     bio = StringField('Bio', validators=[DataRequired("Bio is required")])
